@@ -1,6 +1,7 @@
 return {
   {
     "m4xshen/smartcolumn.nvim",
+    enabled = false,
     event = "VeryLazy",
     opts = {
       disabled_filetypes = {

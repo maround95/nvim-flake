@@ -21,7 +21,6 @@ local function get_lockfile_path()
 end
 local lazyOptions = {
   lockfile = get_lockfile_path(),
-  install = { colorscheme = { "nordfox" } },
   ui = { border = "rounded" },
 }
 
@@ -39,5 +38,3 @@ require("nixCatsUtils.lazyCat").setup(nixCats.pawsible({ "allPlugins", "start", 
 
 require("config.format")
 require("config.keymaps")
-
-print(nixCats('maroun-colorscheme'))

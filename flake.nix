@@ -201,6 +201,7 @@
           noice-nvim
           lualine-nvim
           persistence-nvim
+          transparent-nvim
         ];
 
         extra = [

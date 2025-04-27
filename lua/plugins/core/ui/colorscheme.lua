@@ -4,6 +4,9 @@ return {
     lazy = false,
     priority = 1000,
     opts = {
+      options = {
+        -- transparent = true,
+      },
       groups = {
         all = {
           FloatBorder = { fg = "fg3", bg = "bg0" },
@@ -13,7 +16,7 @@ return {
     },
     config = function(_, opts)
       require("nightfox").setup(opts)
-      vim.cmd.colorscheme("nordfox")
+      vim.cmd.colorscheme("nightfox")
     end,
   },
 }
