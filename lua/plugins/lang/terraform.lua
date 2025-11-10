@@ -1,0 +1,78 @@
+return {
+	{
+		"nvim-treesitter/nvim-treesitter",
+		opts = { ensure_installed = { "terraform", "hcl" } },
+	},
+	{
+		"neovim/nvim-lspconfig",
+		opts = {
+			servers = {
+				terraformls = {},
+			},
+		},
+	},
+	-- ensure terraform tools are installed
+	{
+		"mason-org/mason.nvim",
+		optional = true,
+		opts = { ensure_installed = { "tflint" } },
+	},
+	{
+		"nvimtools/none-ls.nvim",
+		optional = true,
+		opts = function(_, opts)
+			local null_ls = require("null-ls")
+			opts.sources = vim.list_extend(opts.sources or {}, {
+				-- null_ls.builtins.formatting.packer,
+				null_ls.builtins.formatting.opentofu_fmt,
+				null_ls.builtins.diagnostics.opentofu_validate,
+			})
+		end,
+	},
+	{
+		"mfussenegger/nvim-lint",
+		optional = true,
+		opts = {
+			linters_by_ft = {
+				terraform = { "tofu_validate" },
+				tf = { "tofu_validate" },
+			},
+		},
+	},
+	{
+		"stevearc/conform.nvim",
+		optional = true,
+		opts = {
+			formatters_by_ft = {
+				-- hcl = { "packer_fmt" },
+				terraform = { "tofu_fmt" },
+				tf = { "tofu_fmt" },
+				["terraform-vars"] = { "tofu_fmt" },
+			},
+		},
+	},
+	{
+		"nvim-telescope/telescope.nvim",
+		optional = true,
+		specs = {
+			{
+				"ANGkeith/telescope-terraform-doc.nvim",
+				ft = { "terraform", "hcl" },
+				config = function()
+					Utils.plugin.on_load("telescope.nvim", function()
+						require("telescope").load_extension("terraform_doc")
+					end)
+				end,
+			},
+			{
+				"cappyzawa/telescope-terraform.nvim",
+				ft = { "terraform", "hcl" },
+				config = function()
+					Utils.plugin.on_load("telescope.nvim", function()
+						require("telescope").load_extension("terraform")
+					end)
+				end,
+			},
+		},
+	},
+}

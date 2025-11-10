@@ -1,6 +1,24 @@
 -- Stop fooking autocommenting
-vim.api.nvim_create_autocmd('BufWinEnter', {
-    command = 'set formatoptions-=cro',
+vim.api.nvim_create_autocmd("BufWinEnter", {
+	command = "set formatoptions-=cro",
+})
+
+-- Autoformat on write if enabled (per-buffer)
+vim.api.nvim_create_autocmd("BufWritePre", {
+	callback = function(event)
+		if vim.g.autoformat == nil then
+			vim.g.autoformat = true
+		end
+		local format = false
+		if vim.b[event.buf].autoformat == nil then
+			format = vim.g.autoformat
+		else
+			format = vim.b[event.buf].autoformat
+		end
+		if format then
+			vim.lsp.buf.format({ bufnr = event.buf, timeout_ms = 5000 })
+		end
+	end,
 })
 
 -- Check if we need to reload the file when it changed

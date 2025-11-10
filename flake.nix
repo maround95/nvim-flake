@@ -34,11 +34,7 @@
     # see :help nixCats.flake.outputs.categories
     # and
     # :help nixCats.flake.outputs.categoryDefinitions.scheme
-    categoryDefinitions = {
-      pkgs,
-      mkNvimPlugin,
-      ...
-    }: {
+    categoryDefinitions = {pkgs, ...}: {
       # to define and use a new category, simply add a new list to a set here,
       # and later, you will include categoryname = true; in the set you
       # provide when you build the package using this builder function.
@@ -67,25 +63,38 @@
           stylua
           ## nix
           nixd
-          alejandra
+          nixfmt-rfc-style
           deadnix
           statix
           ## python
           basedpyright
           ruff
-          black
-          isort
           ## c/c++/cuda + cmake
           clang-tools
           neocmakelsp
+          cmake-lint
           cmake-format
+          ## docker
+          hadolint
+          dockerfile-language-server
+          docker-compose-language-service
+          ## haskell
+          fourmolu
+          hlint
+          haskell-language-server
+          haskellPackages.cabal-fmt
           ## json & yaml
           vscode-langservers-extracted # for jsonls
           yaml-language-server
           ## bash
           bash-language-server
           shfmt
+          shellcheck
           shellharden
+          ## terraform
+          tflint
+          opentofu
+          terraform-ls
         ];
 
         extra = [
@@ -99,6 +108,8 @@
           gofumpt
           gomodifytags
           impl
+          ## helm
+          helm-ls
           ## latex
           texlab
           ## ltex
@@ -112,7 +123,7 @@
           lldb
           ## typst
           tinymist
-          websocat
+          typstyle
           ## typescript
           vtsls
           ## frontend
@@ -141,6 +152,7 @@
           # core/editor
           trouble-nvim
           fzf-lua
+          mini-ai
           todo-comments-nvim
           which-key-nvim
           neo-tree-nvim
@@ -154,6 +166,9 @@
           lazydev-nvim
           clangd_extensions-nvim
           cmake-tools-nvim
+          luasnip
+          haskell-snippets-nvim
+          haskell-tools-nvim
           # core/protocols
           nvim-lspconfig
           (nvim-treesitter.withPlugins (plugins:
@@ -194,7 +209,6 @@
           (none-ls-nvim.overrideAttrs {name = "null-ls";})
           # core/ui
           bufferline-nvim
-          nightfox-nvim
           smartcolumn-nvim
           mini-icons
           nui-nvim
@@ -202,6 +216,11 @@
           lualine-nvim
           persistence-nvim
           transparent-nvim
+          one-small-step-for-vimkind
+
+          # colorschemes
+          nightfox-nvim
+          tokyonight-nvim
         ];
 
         extra = [
@@ -223,6 +242,9 @@
           typst-vim
           typst-preview-nvim
           SchemaStore-nvim
+
+          helm-ls-nvim
+          venv-selector-nvim
         ];
       };
 
@@ -293,6 +315,8 @@
 
           markdown_css = toString ./assets/terminal.css;
           highlight_css = toString ./assets/highlight.css;
+
+          colorscheme = "nightfox";
         };
         extra = {};
       };

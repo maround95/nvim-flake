@@ -1,40 +1,60 @@
-_G.Utils = require("utils")
+vim.uv = vim.uv or vim.loop
 
-require("config.autocmds")
-require("config.options")
-
--- NOTE: this just gives nixCats global command a default value
--- so that it doesnt throw an error if you didnt install via nix.
--- usage of both this setup and the nixCats command is optional,
--- but it is very useful for passing info from nix to lua so you will likely use it at least once.
-require("nixCatsUtils").setup({
-  non_nix_value = true,
+-- Setup mock nixCats if we're not using nix.
+require("boot.nixCats").setup({
+	non_nix_value = true,
 })
 
--- NOTE: You might want to move the lazy-lock.json file
-local function get_lockfile_path()
-  if require("nixCatsUtils").isNixCats and type(nixCats.settings.unwrappedCfgPath) == "string" then
-    return nixCats.settings.unwrappedCfgPath .. "/lazy-lock.json"
-  else
-    return vim.fn.stdpath("config") .. "/lazy-lock.json"
-  end
-end
-local lazyOptions = {
-  lockfile = get_lockfile_path(),
-  ui = { border = "rounded" },
-}
+-- After this, we have lazy in the rtp
+local lazy_path = require("boot.lazy").download_lazy()
 
--- NOTE: this the lazy wrapper. Use it like require('lazy').setup() but with an extra
--- argument, the path to lazy.nvim as downloaded by nix, or nil, before the normal arguments.
-require("nixCatsUtils.lazyCat").setup(nixCats.pawsible({ "allPlugins", "start", "lazy.nvim" }), {
-  {
-    "folke/snacks.nvim",
-    priority = 1000,
-    lazy = false,
-  },
-  { import = "plugins.core" },
-  { import = "plugins.extra" },
-}, lazyOptions)
+-- Now we can set up utils
+_G.Utils = require("utils")
 
-require("config.format")
-require("config.keymaps")
+-- Options and autocmds before setting lazy up
+require("config.options")
+require("config.autocmds")
+
+-- Setup lazy
+require("boot.lazy").setup(lazy_path, {
+	spec = {
+		{
+			dir = nixCats.configDir, -- The "plugin" is part of this repo
+			main = "config",
+			name = "configPlugin",
+			priority = 10000,
+			lazy = false,
+			opts = {},
+			cond = true, -- Like enabled, but doesn't uninstall the plugin when it's disabled
+		},
+		{
+			"folke/snacks.nvim",
+			priority = 2000,
+			lazy = false,
+			opts = {},
+			config = function(_, opts)
+				local notify = vim.notify
+				require("snacks").setup(opts)
+				-- HACK: restore vim.notify after snacks setup and let noice.nvim take over
+				-- this is needed to have early notifications show up in noice history
+				vim.notify = notify
+			end,
+		},
+		{ import = "plugins" },
+	},
+	performance = {
+		rtp = {
+			-- disable some rtp plugins
+			disabled_plugins = {
+				"gzip",
+				-- "matchit",
+				-- "matchparen",
+				"netrwPlugin",
+				"tarPlugin",
+				"tohtml",
+				"tutor",
+				"zipPlugin",
+			},
+		},
+	},
+})
