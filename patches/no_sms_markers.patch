@@ -1,0 +1,70 @@
+diff --git a/src/nvim/drawline.c b/src/nvim/drawline.c
+index 4348789cb2..f8f87d239b 100644
+--- a/src/nvim/drawline.c
++++ b/src/nvim/drawline.c
+@@ -2882,6 +2882,7 @@ int win_line(win_T *wp, linenr_T lnum, int startrow, int endrow, int col_rows, b
+     }
+ 
+     // Show "extends" character from 'listchars' if beyond the line end.
++    #if 0
+     const schar_T lcs_ext = get_lcs_ext(wp);
+     if (lcs_ext != NUL
+         && wlv.filler_todo <= 0
+@@ -2900,6 +2901,7 @@ int win_line(win_T *wp, linenr_T lnum, int startrow, int endrow, int col_rows, b
+         mb_c = schar_get_first_codepoint(mb_schar);
+       }
+     }
++    #endif
+ 
+     advance_color_col(&wlv, vcol_hlc(wlv));
+ 
+@@ -3190,6 +3192,7 @@ static void wlv_put_linebuf(win_T *wp, const winlinevars_T *wlv, int endcol, boo
+     flags |= SLF_RIGHTLEFT;
+   }
+ 
++  #if 0
+   // Take care of putting "<<<" on the first line for 'smoothscroll'.
+   if (wlv->row == 0 && wp->w_skipcol > 0
+       // do not overwrite the 'showbreak' text with "<<<"
+@@ -3215,6 +3218,7 @@ static void wlv_put_linebuf(win_T *wp, const winlinevars_T *wlv, int endcol, boo
+       off++;
+     }
+   }
++  #endif
+ 
+   int row = wlv->row;
+   int coloff = 0;
+diff --git a/src/nvim/drawscreen.c b/src/nvim/drawscreen.c
+index 800572ae06..f281dbf1f6 100644
+--- a/src/nvim/drawscreen.c
++++ b/src/nvim/drawscreen.c
+@@ -2313,7 +2313,6 @@ redr_statuscol:
+   wp->w_empty_rows = 0;
+   wp->w_filler_rows = 0;
+   if (!eof && !didline) {
+-    int at_attr = hl_combine_attr(win_bg_attr(wp), win_hl_attr(wp, HLF_AT));
+     if (lnum == wp->w_topline) {
+       // Single line that does not fit!
+       // Don't overwrite it, it can be edited.
+@@ -2323,21 +2322,9 @@ redr_statuscol:
+       wp->w_botline = lnum;
+       wp->w_filler_rows = wp->w_view_height - srow;
+     } else if (dy_flags & kOptDyFlagTruncate) {      // 'display' has "truncate"
+-      // Last line isn't finished: Display "@@@" in the last screen line.
+-      grid_line_start(&wp->w_grid, wp->w_view_height - 1);
+-      grid_line_fill(0, MIN(wp->w_view_width, 3), wp->w_p_fcs_chars.lastline, at_attr);
+-      grid_line_fill(3, wp->w_view_width, schar_from_ascii(' '), at_attr);
+-      grid_line_flush();
+       set_empty_rows(wp, srow);
+       wp->w_botline = lnum;
+     } else if (dy_flags & kOptDyFlagLastline) {      // 'display' has "lastline"
+-      // Last line isn't finished: Display "@@@" at the end.
+-      // If this would split a doublewidth char in two, we need to display "@@@@" instead
+-      grid_line_start(&wp->w_grid, wp->w_view_height - 1);
+-      int width = grid_line_getchar(MAX(wp->w_view_width - 3, 0), NULL) == NUL ? 4 : 3;
+-      grid_line_fill(MAX(wp->w_view_width - width, 0), wp->w_view_width,
+-                     wp->w_p_fcs_chars.lastline, at_attr);
+-      grid_line_flush();
+       set_empty_rows(wp, srow);
+       wp->w_botline = lnum;
+     } else {

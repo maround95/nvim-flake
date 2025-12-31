@@ -1,0 +1,120 @@
+local bacon_ls = vim.fn.executable("bacon-ls") == 1
+bacon_ls = false -- TODO: Enable when workspace diagnostics is fixed
+
+return {
+	-- LSP for Cargo.toml
+	{
+		"Saecki/crates.nvim",
+		event = { "BufRead Cargo.toml" },
+		opts = {
+			completion = {
+				crates = {
+					enabled = true,
+				},
+			},
+			lsp = {
+				enabled = true,
+				actions = true,
+				completion = true,
+				hover = true,
+			},
+		},
+	},
+
+	-- Add Rust & related to treesitter
+	{
+		"nvim-treesitter/nvim-treesitter",
+		opts = { ensure_installed = { "rust", "ron" } },
+	},
+
+	-- Ensure Rust debugger is installed
+	{
+		"mason-org/mason.nvim",
+		optional = true,
+		opts = function(_, opts)
+			opts.ensure_installed = opts.ensure_installed or {}
+			vim.list_extend(opts.ensure_installed, { "codelldb", "bacon" })
+		end,
+	},
+
+	{
+		"mrcjkb/rustaceanvim",
+		ft = { "rust" },
+		opts = {
+			server = {
+				on_attach = function(_, bufnr)
+					vim.keymap.set("n", "<leader>ca", function()
+						vim.cmd.RustLsp("codeAction")
+					end, { desc = "Code Action", buffer = bufnr })
+					vim.keymap.set("n", "<leader>dr", function()
+						vim.cmd.RustLsp("debuggables")
+					end, { desc = "Rust Debuggables", buffer = bufnr })
+				end,
+				default_settings = {
+					-- rust-analyzer language server configuration
+					["rust-analyzer"] = {
+						cargo = {
+							allFeatures = true,
+							loadOutDirsFromCheck = true,
+							buildScripts = {
+								enable = true,
+							},
+						},
+						-- Add clippy lints for Rust if using rust-analyzer
+						checkOnSave = not bacon_ls,
+						-- Enable diagnostics if using rust-analyzer
+						diagnostics = {
+							enable = not bacon_ls,
+						},
+						procMacro = {
+							enable = true,
+						},
+						files = {
+							exclude = {
+								".direnv",
+								".git",
+								".jj",
+								".github",
+								".gitlab",
+								"bin",
+								"node_modules",
+								"target",
+								"venv",
+								".venv",
+							},
+							-- Avoid Roots Scanned hanging, see https://github.com/rust-lang/rust-analyzer/issues/12613#issuecomment-2096386344
+							watcher = "client",
+						},
+					},
+				},
+			},
+		},
+		config = function(_, opts)
+			-- TODO: dap
+			vim.g.rustaceanvim = vim.tbl_deep_extend("keep", vim.g.rustaceanvim or {}, opts or {})
+		end,
+	},
+
+	-- Correctly setup lspconfig for Rust 🚀
+	{
+		"neovim/nvim-lspconfig",
+		opts = {
+			servers = {
+				bacon_ls = {
+					enabled = bacon_ls,
+				},
+				rust_analyzer = { enabled = false },
+			},
+		},
+	},
+
+	{
+		"nvim-neotest/neotest",
+		optional = true,
+		opts = {
+			adapters = {
+				["rustaceanvim.neotest"] = {},
+			},
+		},
+	},
+}
