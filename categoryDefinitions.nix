@@ -132,8 +132,6 @@
       yazi-nvim
       gitsigns-nvim
       undotree
-      zellij-nav-nvim
-      vim-tmux-navigator
       # core/languages
       lazydev-nvim
       clangd_extensions-nvim
@@ -220,6 +218,12 @@
 
       helm-ls-nvim
       venv-selector-nvim
+    ];
+
+    tmux = [
+    ];
+    zellij = [
+      zellij-nav-nvim
     ];
   };
 

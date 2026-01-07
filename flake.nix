@@ -63,6 +63,7 @@
             categories = {
               general = true;
               extra = true;
+              tmux = true;
 
               zellijVimBridge = "${pkgs.nixCatsBuilds.zellijVimBridge}/bin/zellij-vim-bridge";
 
@@ -83,6 +84,9 @@
         mvim-scrollback =
           { pkgs, ... }:
           {
+            categories = {
+              tmux = true;
+            };
             settings = {
               suffix-path = true;
               suffix-LD = true;
@@ -97,38 +101,62 @@
     forEachSystem (
       system:
       let
-        # the builder function that makes it all work
+        pkgs = import nixpkgs { inherit system; };
+
         nixCatsBuilder =
-          luaPath: nixCats_passthru:
+          luaPath: packageName:
+          let
+            packageDef = packageDefinitions.${packageName};
+            evaluated = packageDef { inherit pkgs; };
+            tmux-support = evaluated.categories.tmux or false;
+          in
           utils.baseBuilder luaPath {
             inherit
               nixpkgs
               system
               dependencyOverlays
               extra_pkg_config
-              nixCats_passthru
               ;
-          } categoryDefinitions packageDefinitions;
-        pkgs = import nixpkgs { inherit system; };
+            nixCats_passthru = {
+              inherit tmux-support;
+            };
+          } categoryDefinitions packageDefinitions packageName;
       in
       rec {
-        # these outputs will be wrapped with ${system} by utils.eachSystem
+        packages =
+          let
+            mkLuaPath =
+              configDir:
+              pkgs.runCommand "nvim-config" { } ''
+                mkdir -p "$out"
 
-        # this will make a package out of each of the packageDefinitions defined above
-        # and set the default package to the one passed in here.
-        packages = rec {
-          default = mvim;
+                cp -r ${configDir}/. "$out/"
 
-          # TODO: single source of truth for tmux-support
-          mvim = nixCatsBuilder "${./mvim}" { tmux-support = true; } "mvim";
-          mvim-nightly = nixCatsBuilder "${./mvim}" { tmux-support = true; } "mvim-nightly";
-          mvim-scrollback = nixCatsBuilder "${./scrollback}" { tmux-support = true; } "mvim-scrollback";
-        };
+                chmod -R u+w "$out"
+
+                mkdir -p "$out/lua/mvim"
+                cp -r ${./utils} "$out/lua/mvim/utils"
+              '';
+
+            mkPackage = name: luaPath: nixCatsBuilder luaPath name;
+
+            configs = {
+              mvim = (mkLuaPath ./mvim);
+              mvim-nightly = (mkLuaPath ./mvim);
+              mvim-scrollback = (mkLuaPath ./scrollback);
+            };
+
+            built = lib.mapAttrs mkPackage configs;
+          in
+          built
+          // {
+            default = built.mvim;
+          };
 
         devShells = {
           default = pkgs.mkShell {
             name = "mvim-devshell";
-            packages = [ ] // packages;
+            packages = [ ] ++ packages;
             inputsFrom = [ ];
             shellHook = "";
           };

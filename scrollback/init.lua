@@ -70,3 +70,5 @@ vim.api.nvim_create_autocmd("BufReadPost", {
     vim.api.nvim_win_set_cursor(0, { last, vim.fn.col("$") })
   end,
 })
+
+require("mvim.utils.navigation").setup()

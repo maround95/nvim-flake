@@ -6,11 +6,7 @@ map({ "n", "x" }, "<Down>", "v:count == 0 ? 'gj' : 'j'", { desc = "Down", expr =
 map({ "n", "x" }, "k", "v:count == 0 ? 'gk' : 'k'", { desc = "Up", expr = true, silent = true })
 map({ "n", "x" }, "<Up>", "v:count == 0 ? 'gk' : 'k'", { desc = "Up", expr = true, silent = true })
 
--- -- Navigation even if we're outside of tmux/zellij
--- map("n", "<m-h>", "<c-w>h", { desc = "Go to left window", remap = true })
--- map("n", "<m-j>", "<c-w>j", { desc = "Go to lower window", remap = true })
--- map("n", "<m-k>", "<c-w>k", { desc = "Go to upper window", remap = true })
--- map("n", "<m-l>", "<c-w>l", { desc = "Go to right window", remap = true })
+require("mvim.utils.navigation").setup()
 
 -- Resize window using <ctrl> arrow keys
 map("n", "<c-up>", "<cmd>resize +2<cr>", { desc = "Increase window height" })
