@@ -25,38 +25,37 @@ map("v", "<a-u>", ":<c-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<cr>gv=gv", {
 -- System clipboard
 map({ "n", "v" }, "<leader>p", [["+p]])
 map({ "n", "v" }, "<leader>y", [["+y]])
-map("n", "<leader>Y", [["+Y]])
 
 -- Buffers
 map("n", "<leader>bb", "<cmd>e #<cr>", { desc = "Switch to other buffer" })
 map("n", "<leader>`", "<cmd>e #<cr>", { desc = "Switch to other buffer" })
 map("n", "<leader>bd", function()
-	Snacks.bufdelete.delete()
+  Snacks.bufdelete.delete()
 end, { desc = "Delete buffer" })
 map("n", "<leader>bo", function()
-	Snacks.bufdelete.other()
+  Snacks.bufdelete.other()
 end, { desc = "Delete other buffers" })
 map("n", "<leader>ba", function()
-	Snacks.bufdelete.all()
+  Snacks.bufdelete.all()
 end, { desc = "Delete all buffers" })
 map("n", "<leader>bD", "<cmd>:bd<cr>", { desc = "Delete buffer and window" })
 
 -- clear search and stop snippets on backspace
 map({ "i", "n", "s" }, "<Backspace>", function()
-	vim.cmd([[noh]])
-	if vim.snippet then
-		vim.snippet.stop()
-	end
-	return "<Backspace>"
+  vim.cmd([[noh]])
+  if vim.snippet then
+    vim.snippet.stop()
+  end
+  return "<Backspace>"
 end, { expr = true, desc = "Escape and clear hlsearch" })
 
 -- Clear search, diff update and redraw
 -- taken from runtime/lua/_editor.lua
 map(
-	"n",
-	"<leader>ur",
-	"<Cmd>nohlsearch<Bar>diffupdate<Bar>normal! <C-L><CR>",
-	{ desc = "Redraw / Clear hlsearch / Diff Update" }
+  "n",
+  "<leader>ur",
+  "<Cmd>nohlsearch<Bar>diffupdate<Bar>normal! <C-L><CR>",
+  { desc = "Redraw / Clear hlsearch / Diff Update" }
 )
 
 -- https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n
@@ -89,13 +88,13 @@ map("n", "gcO", "O<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Commen
 
 -- diagnostic
 local diagnostic_goto = function(next, severity)
-	return function()
-		vim.diagnostic.jump({
-			count = (next and 1 or -1) * vim.v.count1,
-			severity = severity and vim.diagnostic.severity[severity] or nil,
-			float = true,
-		})
-	end
+  return function()
+    vim.diagnostic.jump({
+      count = (next and 1 or -1) * vim.v.count1,
+      severity = severity and vim.diagnostic.severity[severity] or nil,
+      float = true,
+    })
+  end
 end
 map("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Line Diagnostics" })
 map("n", "]d", diagnostic_goto(true), { desc = "Next Diagnostic" })
@@ -107,29 +106,29 @@ map("n", "[w", diagnostic_goto(false, "WARN"), { desc = "Prev Warning" })
 
 -- git & lazygit
 map("n", "<leader>gb", function()
-	Snacks.picker.git_log_line()
+  Snacks.picker.git_log_line()
 end, { desc = "Git blame line" })
 map({ "n", "x" }, "<leader>gB", function()
-	Snacks.gitbrowse()
+  Snacks.gitbrowse()
 end, { desc = "Git browse (open)" })
 map({ "n", "x" }, "<leader>gY", function()
-	Snacks.gitbrowse({
-		open = function(url)
-			vim.fn.setreg("+", url)
-		end,
-		notify = false,
-	})
+  Snacks.gitbrowse({
+    open = function(url)
+      vim.fn.setreg("+", url)
+    end,
+    notify = false,
+  })
 end, { desc = "Git browse (copy)" })
 if vim.fn.executable("lazygit") == 1 then
-	map("n", "<leader>gg", function()
-		Snacks.lazygit()
-	end, { desc = "Lazygit" })
-	map("n", "<leader>gf", function()
-		Snacks.picker.git_log_file()
-	end, { desc = "Git Current File History" })
-	map("n", "<leader>gl", function()
-		Snacks.picker.git_log()
-	end, { desc = "Git log" })
+  map("n", "<leader>gg", function()
+    Snacks.lazygit()
+  end, { desc = "Lazygit" })
+  map("n", "<leader>gf", function()
+    Snacks.picker.git_log_file()
+  end, { desc = "Git Current File History" })
+  map("n", "<leader>gl", function()
+    Snacks.picker.git_log()
+  end, { desc = "Git log" })
 end
 
 -- windows
@@ -154,54 +153,78 @@ Snacks.toggle.treesitter():map("<leader>uT")
 Snacks.toggle.diagnostics():map("<leader>ud")
 
 if vim.lsp.inlay_hint then
-	Snacks.toggle.inlay_hints():map("<leader>uh")
+  Snacks.toggle.inlay_hints():map("<leader>uh")
 end
 
 -- formatting
 vim.keymap.set({ "n", "v" }, "<leader>cf", function()
-	vim.lsp.buf.format({
-		async = true,
-		bufnr = vim.api.nvim_get_current_buf(),
-	})
+  vim.lsp.buf.format({
+    async = true,
+    bufnr = vim.api.nvim_get_current_buf(),
+  })
 end, {
-	desc = "Format (Async)",
+  desc = "Format (Async)",
 })
 
 local function autoformat_toggle(bufonly)
-	return Snacks.toggle({
-		name = "autoformat (" .. (bufonly and "buffer" or "global") .. ")",
-		get = function()
-			local buf = vim.api.nvim_get_current_buf()
-			if not bufonly or vim.b[buf].autoformat == nil then
-				return vim.g.autoformat
-			end
-			return vim.b[buf].autoformat
-		end,
-		set = function(state)
-			local buf = vim.api.nvim_get_current_buf()
-			if bufonly then
-				vim.b[buf].autoformat = state
-			else
-				vim.g.autoformat = state
-				vim.b[buf].autoformat = nil
-			end
+  return Snacks.toggle({
+    name = "autoformat (" .. (bufonly and "buffer" or "global") .. ")",
+    get = function()
+      local buf = vim.api.nvim_get_current_buf()
+      if not bufonly or vim.b[buf].autoformat == nil then
+        return vim.g.autoformat
+      end
+      return vim.b[buf].autoformat
+    end,
+    set = function(state)
+      local buf = vim.api.nvim_get_current_buf()
+      if bufonly then
+        vim.b[buf].autoformat = state
+      else
+        vim.g.autoformat = state
+        vim.b[buf].autoformat = nil
+      end
 
-			local global = vim.g.autoformat
-			local buffer = state
+      local global = vim.g.autoformat
+      local buffer = state
 
-			local lines = {
-				"# Autoformat Status",
-				"- [" .. (global and "x" or " ") .. "] Global: " .. (global and "**Enabled**" or "**Disabled**"),
-				"- [" .. (buffer and "x" or " ") .. "] Buffer: " .. (buffer and "**Enabled**" or "**Disabled**"),
-			}
+      local lines = {
+        "# Autoformat Status",
+        "- [" .. (global and "x" or " ") .. "] Global: " .. (global and "**Enabled**" or "**Disabled**"),
+        "- [" .. (buffer and "x" or " ") .. "] Buffer: " .. (buffer and "**Enabled**" or "**Disabled**"),
+      }
 
-			Snacks.notify[buffer and "info" or "warn"](
-				table.concat(lines, "\n"),
-				{ title = "Autoformat " .. (buffer and "Enabled" or "Disabled") }
-			)
-		end,
-	})
+      Snacks.notify[buffer and "info" or "warn"](
+        table.concat(lines, "\n"),
+        { title = "Autoformat " .. (buffer and "Enabled" or "Disabled") }
+      )
+    end,
+  })
 end
 
 autoformat_toggle(false):map("<leader>uF") -- Global autoformat
-autoformat_toggle(true):map("<leader>uf") -- Per-buffer autoformat
+autoformat_toggle(true):map("<leader>uf")  -- Per-buffer autoformat
+
+-- Clipboard toggle
+local function clipboard_toggle()
+  return Snacks.toggle({
+    name = "OS Clipboard",
+    get = function()
+      return vim.api.nvim_get_option_value("clipboard", {}) == "unnamedplus"
+    end,
+    set = function(state)
+      if state then
+        vim.opt.clipboard = "unnamedplus"
+      else
+        vim.opt.clipboard = ""
+      end
+    end,
+  })
+end
+
+clipboard_toggle():map("<leader>uy")
+
+-- Move contents of copy register to unnamedplus (system)
+vim.keymap.set("n", "<leader>Y", function()
+  vim.fn.setreg("+", vim.fn.getreg('"'), vim.fn.getregtype('"'))
+end)

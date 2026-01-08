@@ -33,7 +33,6 @@ end
 
 local function tmux_run_nav(opt_name)
   local cmd = get_tmux_nav_cmd(opt_name)
-  print(cmd)
   if cmd then
     vim.fn.system({ "tmux", "run-shell", "-b", cmd })
   end
@@ -45,14 +44,11 @@ local function clear_cache()
 end
 
 function M.nav(dir, tmux_opt)
-  print("Nav!")
   if try_wincmd(dir) then return end
-  print("tmux?")
   if in_tmux() then tmux_run_nav(tmux_opt) end
 end
 
 function M.setup()
-  print("Hello!")
   vim.keymap.set("n", "<M-h>", function() M.nav("h", "@nav_left") end, { silent = true })
   vim.keymap.set("n", "<M-j>", function() M.nav("j", "@nav_down") end, { silent = true })
   vim.keymap.set("n", "<M-k>", function() M.nav("k", "@nav_up") end, { silent = true })
