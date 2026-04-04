@@ -132,6 +132,7 @@
       yazi-nvim
       gitsigns-nvim
       undotree
+      harpoon2
       # core/languages
       lazydev-nvim
       clangd_extensions-nvim

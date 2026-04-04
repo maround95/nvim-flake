@@ -29,16 +29,32 @@ map({ "n", "v" }, "<leader>y", [["+y]])
 -- Buffers
 map("n", "<leader>bb", "<cmd>e #<cr>", { desc = "Switch to other buffer" })
 map("n", "<leader>`", "<cmd>e #<cr>", { desc = "Switch to other buffer" })
-map("n", "<leader>bd", function()
-  Snacks.bufdelete.delete()
-end, { desc = "Delete buffer" })
-map("n", "<leader>bo", function()
-  Snacks.bufdelete.other()
-end, { desc = "Delete other buffers" })
-map("n", "<leader>ba", function()
-  Snacks.bufdelete.all()
-end, { desc = "Delete all buffers" })
+map("n", "<leader>bd", function() Snacks.bufdelete.delete() end, { desc = "Delete buffer" })
 map("n", "<leader>bD", "<cmd>:bd<cr>", { desc = "Delete buffer and window" })
+
+local pins = require("mvim.utils.pins")
+map("n", "<leader>bO", function()
+  pins.unpin_others()
+  Snacks.bufdelete.other()
+end, { desc = "Delete other buffers (including pinned)" })
+map("n", "<leader>bA", function()
+  pins.unpin_all()
+  Snacks.bufdelete.all()
+end, { desc = "Delete all buffers (including pinned)" })
+
+map("n", "<leader>bo", function()
+  for _, bufnr in ipairs(pins.unpinned_bufs()) do
+    if bufnr ~= vim.api.nvim_get_current_buf() then
+      Snacks.bufdelete(bufnr)
+    end
+  end
+end, { desc = "Delete other buffers (keep pinned)" })
+map("n", "<leader>ba", function()
+  for _, bufnr in ipairs(pins.unpinned_bufs()) do
+    Snacks.bufdelete(bufnr)
+  end
+end, { desc = "Delete all buffers (keep pinned)" })
+
 
 -- clear search and stop snippets on backspace
 map({ "i", "n", "s" }, "<Backspace>", function()

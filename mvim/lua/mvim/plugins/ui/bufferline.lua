@@ -4,18 +4,21 @@ local zjinfo_columns = function()
   return zellijCols:match('^%d+$') and tonumber(zellijCols) or nil
 end
 
+local pins = require("mvim.utils.pins")
+
 return {
   {
     "willothy/nvim-cokeline",
     enabled = true,
     event = "VeryLazy",
     keys = {
-      { "<s-h>", "<Plug>(cokeline-focus-prev)",  desc = "Prev buffer" },
-      { "<s-l>", "<Plug>(cokeline-focus-next)",  desc = "Next buffer" },
-      { "[b",    "<Plug>(cokeline-focus-prev)",  desc = "Prev buffer" },
-      { "]b",    "<Plug>(cokeline-focus-next)",  desc = "Next buffer" },
-      { "[B",    "<Plug>(cokeline-switch-prev)", desc = "Move buffer prev" },
-      { "]B",    "<Plug>(cokeline-switch-next)", desc = "Move buffer next" },
+      { "<s-h>",      "<Plug>(cokeline-focus-prev)",  desc = "Prev buffer" },
+      { "<s-l>",      "<Plug>(cokeline-focus-next)",  desc = "Next buffer" },
+      { "[b",         "<Plug>(cokeline-focus-prev)",  desc = "Prev buffer" },
+      { "]b",         "<Plug>(cokeline-focus-next)",  desc = "Next buffer" },
+      { "[B",         "<Plug>(cokeline-switch-prev)", desc = "Move buffer prev" },
+      { "]B",         "<Plug>(cokeline-switch-next)", desc = "Move buffer next" },
+      { "<leader>bp", function() pins.toggle() end,   desc = "Toggle buffer pin" },
     },
     opts = function()
       local hlgroups = require("cokeline.hlgroups")
@@ -26,6 +29,7 @@ return {
 
         buffers = {
           delete_on_right_click = false,
+          new_buffers_position = pins.sorter(),
         },
 
         mappings = {
@@ -81,6 +85,11 @@ return {
             end,
             bold = function(buffer)
               return buffer.is_focused
+            end,
+          },
+          {
+            text = function(buffer)
+              return pins.is_pinned(buffer.number) and "󰐃 " or ""
             end,
           },
           {
