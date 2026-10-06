@@ -47,13 +47,14 @@ let
       # TODO: Each package instantiates its own (same) instance - good for public API, not good for standalone
       buildPkgs = import inputs.nixpkgs {
         inherit system;
+        config.allowUnfree = true;
         overlays = [ buildOverlay ];
       };
 
       preset = presets.${presetName};
       baseSpec = preset.spec { pkgs = buildPkgs; };
       mergedSpec = lib.recursiveUpdate baseSpec {
-        categories = (builtins.removeAttrs args reservedArgs) // categories;
+        categories = (removeAttrs args reservedArgs) // categories;
         inherit settings extra;
       };
       spec = overrideSpec args mergedSpec;
