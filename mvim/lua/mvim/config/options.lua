@@ -18,7 +18,8 @@ vim.opt.fillchars = {
 }
 vim.opt.foldenable = true
 vim.opt.foldlevel = 99
-vim.opt.foldmethod = "indent"
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
 vim.opt.foldtext = ""
 vim.opt.formatexpr = "v:lua.vim.lsp.formatexpr({ timeout_ms = 3000 })" -- TODO: Conform?
 vim.opt.formatoptions = "jcroqlnt"

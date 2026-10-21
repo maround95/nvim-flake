@@ -22,7 +22,7 @@ return {
 			-- Be aware that you also will need to properly configure your LSP server to
 			-- provide the folds.
 			folds = {
-				enabled = true,
+				enabled = false,
 			},
 			-- options for vim.lsp.buf.format
 			-- `bufnr` and `filter` is handled by the LazyVim formatter,

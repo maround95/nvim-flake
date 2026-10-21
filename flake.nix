@@ -20,6 +20,11 @@
       flake = false;
     };
 
+    plugins-opencode-nvim = {
+      url = "github:sudo-tee/opencode.nvim";
+      flake = false;
+    };
+
     # bacon-ls = {
     #   url = "github:crisidev/bacon-ls";
     #   inputs.nixpkgs.follows = "nixpkgs";

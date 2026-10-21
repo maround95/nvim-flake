@@ -24,7 +24,6 @@ return {
 			-- 'enter' for mappings similar to 'super-tab' but with 'enter' to accept
 			-- See the full "keymap" documentation for information on defining your own keymap.
 			keymap = {
-				["<c-space>"] = { "accept", "fallback" },
 				["<c-b>"] = { "scroll_documentation_up", "fallback" },
 				["<c-f>"] = { "scroll_documentation_down", "fallback" },
 				["<c-e>"] = { "cancel", "fallback" },

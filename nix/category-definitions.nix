@@ -82,6 +82,7 @@
       tabout-nvim
       rainbow-delimiters-nvim
       diffview-nvim
+      neogit
       trouble-nvim
       fzf-lua
       mini-ai
@@ -148,6 +149,8 @@
       pkgs.neovimPlugins.vim-tpipeline-zellij
       nightfox-nvim
       tokyonight-nvim
+
+      pkgs.neovimPlugins.opencode-nvim
     ];
 
     extra = [
